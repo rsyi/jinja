@@ -191,10 +191,7 @@ pub fn xmlattr(value: &Value, kwargs: Kwargs) -> Result<Value, Error> {
 /// ```
 pub fn as_bool(value: &Value) -> bool {
     if let Some(s) = value.as_str() {
-        matches!(
-            s.to_lowercase().as_str(),
-            "true" | "1" | "yes" | "on"
-        )
+        matches!(s.to_lowercase().as_str(), "true" | "1" | "yes" | "on")
     } else {
         value.is_true()
     }

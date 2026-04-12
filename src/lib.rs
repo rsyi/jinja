@@ -47,8 +47,7 @@ pub mod tests_builtin;
 
 // Re-export core minijinja types
 pub use minijinja::{
-    context,
-    render,
+    context, render,
     value::{self, Value},
     Environment, Error, ErrorKind, State, Template,
 };
@@ -105,8 +104,7 @@ mod tests {
     #[test]
     fn test_new_jinja2_basic() {
         let mut env = new_jinja2();
-        env.add_template("hello", "Hello {{ name }}!")
-            .unwrap();
+        env.add_template("hello", "Hello {{ name }}!").unwrap();
         let tmpl = env.get_template("hello").unwrap();
         let result = tmpl.render(context!(name => "World")).unwrap();
         assert_eq!(result, "Hello World!");
@@ -115,8 +113,7 @@ mod tests {
     #[test]
     fn test_center_filter() {
         let mut env = new_jinja2();
-        env.add_template("test", "{{ value|center(20) }}")
-            .unwrap();
+        env.add_template("test", "{{ value|center(20) }}").unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl.render(context!(value => "hello")).unwrap();
         assert_eq!(result, "       hello        ");
@@ -125,8 +122,11 @@ mod tests {
     #[test]
     fn test_forceescape_filter() {
         let mut env = new_jinja2();
-        env.add_template("test", "{% autoescape true %}{{ value|forceescape }}{% endautoescape %}")
-            .unwrap();
+        env.add_template(
+            "test",
+            "{% autoescape true %}{{ value|forceescape }}{% endautoescape %}",
+        )
+        .unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl.render(context!(value => "<b>bold</b>")).unwrap();
         assert!(result.contains("&lt;"));
@@ -135,8 +135,7 @@ mod tests {
     #[test]
     fn test_urlize_filter() {
         let mut env = new_jinja2();
-        env.add_template("test", "{{ value|urlize }}")
-            .unwrap();
+        env.add_template("test", "{{ value|urlize }}").unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl
             .render(context!(value => "Visit https://example.com today!"))
@@ -148,11 +147,12 @@ mod tests {
     #[test]
     fn test_xmlattr_filter() {
         let mut env = new_jinja2();
-        env.add_template("test", "<ul{{ attrs|xmlattr }}>")
-            .unwrap();
+        env.add_template("test", "<ul{{ attrs|xmlattr }}>").unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl
-            .render(context!(attrs => Value::from_serialize(&json!({"class": "nav", "id": "main"}))))
+            .render(
+                context!(attrs => Value::from_serialize(&json!({"class": "nav", "id": "main"}))),
+            )
             .unwrap();
         assert!(result.contains("class=\"nav\""));
         assert!(result.contains("id=\"main\""));
@@ -174,8 +174,7 @@ mod tests {
     #[test]
     fn test_striptags_filter() {
         let mut env = new_jinja2();
-        env.add_template("test", "{{ value|striptags }}")
-            .unwrap();
+        env.add_template("test", "{{ value|striptags }}").unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl
             .render(context!(value => "<p>Hello <b>World</b></p>"))
@@ -196,8 +195,7 @@ mod tests {
     #[test]
     fn test_wordcount_filter() {
         let mut env = new_jinja2();
-        env.add_template("test", "{{ value|wordcount }}")
-            .unwrap();
+        env.add_template("test", "{{ value|wordcount }}").unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl
             .render(context!(value => "Hello beautiful world"))
@@ -218,8 +216,7 @@ mod tests {
     #[test]
     fn test_python_method_compat() {
         let mut env = new_jinja2();
-        env.add_template("test", "{{ 'hello'.upper() }}")
-            .unwrap();
+        env.add_template("test", "{{ 'hello'.upper() }}").unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl.render(()).unwrap();
         assert_eq!(result, "HELLO");
@@ -228,10 +225,15 @@ mod tests {
     #[test]
     fn test_dict_methods() {
         let mut env = new_jinja2();
-        env.add_template("test", "{% for k, v in data.items() %}{{ k }}={{ v }} {% endfor %}")
-            .unwrap();
+        env.add_template(
+            "test",
+            "{% for k, v in data.items() %}{{ k }}={{ v }} {% endfor %}",
+        )
+        .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl.render(context!(data => Value::from_serialize(&json!({"a": 1})))).unwrap();
+        let result = tmpl
+            .render(context!(data => Value::from_serialize(&json!({"a": 1}))))
+            .unwrap();
         assert!(result.contains("a=1"));
     }
 
@@ -282,8 +284,11 @@ mod tests {
     #[test]
     fn test_callable_test() {
         let mut env = new_jinja2();
-        env.add_template("test", "{% if range is callable %}yes{% else %}no{% endif %}")
-            .unwrap();
+        env.add_template(
+            "test",
+            "{% if range is callable %}yes{% else %}no{% endif %}",
+        )
+        .unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl.render(()).unwrap();
         assert_eq!(result, "yes");
@@ -292,8 +297,7 @@ mod tests {
     #[test]
     fn test_tojson_filter() {
         let mut env = new_jinja2();
-        env.add_template("test", "{{ value|tojson }}")
-            .unwrap();
+        env.add_template("test", "{{ value|tojson }}").unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl
             .render(context!(value => Value::from_serialize(&json!({"key": "value"}))))
@@ -305,12 +309,9 @@ mod tests {
     #[test]
     fn test_urlencode_filter() {
         let mut env = new_jinja2();
-        env.add_template("test", "{{ value|urlencode }}")
-            .unwrap();
+        env.add_template("test", "{{ value|urlencode }}").unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(value => "hello world"))
-            .unwrap();
+        let result = tmpl.render(context!(value => "hello world")).unwrap();
         assert_eq!(result, "hello%20world");
     }
 
@@ -337,9 +338,7 @@ mod tests {
         )
         .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(items => vec!["a", "b", "c"]))
-            .unwrap();
+        let result = tmpl.render(context!(items => vec!["a", "b", "c"])).unwrap();
         assert_eq!(result, "a, b, c");
     }
 
@@ -352,9 +351,7 @@ mod tests {
         )
         .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(items => vec![1, 2, 3]))
-            .unwrap();
+        let result = tmpl.render(context!(items => vec![1, 2, 3])).unwrap();
         assert_eq!(result, "3");
     }
 
@@ -378,10 +375,7 @@ mod tests {
         // replace
         env.add_template("t4", "{{ 'hello'|replace('l', 'r') }}")
             .unwrap();
-        assert_eq!(
-            env.get_template("t4").unwrap().render(()).unwrap(),
-            "herro"
-        );
+        assert_eq!(env.get_template("t4").unwrap().render(()).unwrap(), "herro");
 
         // default
         env.add_template("t5", "{{ x|default('fallback') }}")
@@ -454,24 +448,15 @@ mod tests {
 
         // abs
         env.add_template("t12", "{{ -5|abs }}").unwrap();
-        assert_eq!(
-            env.get_template("t12").unwrap().render(()).unwrap(),
-            "5"
-        );
+        assert_eq!(env.get_template("t12").unwrap().render(()).unwrap(), "5");
 
         // round
         env.add_template("t13", "{{ 3.7|round }}").unwrap();
-        assert_eq!(
-            env.get_template("t13").unwrap().render(()).unwrap(),
-            "4.0"
-        );
+        assert_eq!(env.get_template("t13").unwrap().render(()).unwrap(), "4.0");
 
         // int/float
         env.add_template("t14", "{{ '42'|int }}").unwrap();
-        assert_eq!(
-            env.get_template("t14").unwrap().render(()).unwrap(),
-            "42"
-        );
+        assert_eq!(env.get_template("t14").unwrap().render(()).unwrap(), "42");
 
         // trim
         env.add_template("t15", "{{ '  hello  '|trim }}").unwrap();
@@ -620,11 +605,8 @@ mod tests {
     #[test]
     fn test_with_block() {
         let mut env = new_jinja2();
-        env.add_template(
-            "test",
-            "{% with x = 42 %}{{ x }}{% endwith %}",
-        )
-        .unwrap();
+        env.add_template("test", "{% with x = 42 %}{{ x }}{% endwith %}")
+            .unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl.render(()).unwrap();
         assert_eq!(result, "42");
@@ -708,9 +690,7 @@ mod tests {
         )
         .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(items => vec!["a", "b", "c"]))
-            .unwrap();
+        let result = tmpl.render(context!(items => vec!["a", "b", "c"])).unwrap();
         assert_eq!(result, "1:a 2:b 3:c ");
     }
 
@@ -720,14 +700,8 @@ mod tests {
         env.add_template("test", "{{ 'yes' if flag else 'no' }}")
             .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        assert_eq!(
-            tmpl.render(context!(flag => true)).unwrap(),
-            "yes"
-        );
-        assert_eq!(
-            tmpl.render(context!(flag => false)).unwrap(),
-            "no"
-        );
+        assert_eq!(tmpl.render(context!(flag => true)).unwrap(), "yes");
+        assert_eq!(tmpl.render(context!(flag => false)).unwrap(), "no");
     }
 
     #[test]
@@ -746,9 +720,7 @@ mod tests {
         env.add_template("test", "{{ items[1:3]|join(', ') }}")
             .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(items => vec![1, 2, 3, 4, 5]))
-            .unwrap();
+        let result = tmpl.render(context!(items => vec![1, 2, 3, 4, 5])).unwrap();
         assert_eq!(result, "2, 3");
     }
 
@@ -782,8 +754,7 @@ mod tests {
     #[test]
     fn test_autoescape() {
         let mut env = new_jinja2();
-        env.add_template("test.html", "{{ value }}")
-            .unwrap();
+        env.add_template("test.html", "{{ value }}").unwrap();
         let tmpl = env.get_template("test.html").unwrap();
         let result = tmpl
             .render(context!(value => "<script>alert('xss')</script>"))
@@ -795,12 +766,9 @@ mod tests {
     #[test]
     fn test_safe_filter_with_autoescape() {
         let mut env = new_jinja2();
-        env.add_template("test.html", "{{ value|safe }}")
-            .unwrap();
+        env.add_template("test.html", "{{ value|safe }}").unwrap();
         let tmpl = env.get_template("test.html").unwrap();
-        let result = tmpl
-            .render(context!(value => "<b>bold</b>"))
-            .unwrap();
+        let result = tmpl.render(context!(value => "<b>bold</b>")).unwrap();
         assert_eq!(result, "<b>bold</b>");
     }
 
@@ -850,9 +818,7 @@ mod tests {
         )
         .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(items => Vec::<i32>::new()))
-            .unwrap();
+        let result = tmpl.render(context!(items => Vec::<i32>::new())).unwrap();
         assert_eq!(result, "empty");
     }
 
@@ -882,11 +848,8 @@ mod tests {
     #[test]
     fn test_multiple_inheritance_levels() {
         let mut env = new_jinja2();
-        env.add_template(
-            "base",
-            "A {% block content %}base{% endblock %} Z",
-        )
-        .unwrap();
+        env.add_template("base", "A {% block content %}base{% endblock %} Z")
+            .unwrap();
         env.add_template(
             "mid",
             "{% extends 'base' %}{% block content %}mid-{% block inner %}inner{% endblock %}{% endblock %}",
@@ -935,15 +898,10 @@ mod tests {
     fn test_filtered_for_loop() {
         // {% for x in list if cond %} - heavily used in airform/dbt
         let mut env = new_jinja2();
-        env.add_template(
-            "test",
-            "{% for i in items if i > 2 %}{{ i }} {% endfor %}",
-        )
-        .unwrap();
-        let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(items => vec![1, 2, 3, 4, 5]))
+        env.add_template("test", "{% for i in items if i > 2 %}{{ i }} {% endfor %}")
             .unwrap();
+        let tmpl = env.get_template("test").unwrap();
+        let result = tmpl.render(context!(items => vec![1, 2, 3, 4, 5])).unwrap();
         assert_eq!(result, "3 4 5 ");
     }
 
@@ -968,11 +926,8 @@ mod tests {
         let mut env = new_jinja2();
 
         // loop.index (1-based)
-        env.add_template(
-            "t1",
-            "{% for i in items %}{{ loop.index }}{% endfor %}",
-        )
-        .unwrap();
+        env.add_template("t1", "{% for i in items %}{{ loop.index }}{% endfor %}")
+            .unwrap();
         assert_eq!(
             env.get_template("t1")
                 .unwrap()
@@ -982,11 +937,8 @@ mod tests {
         );
 
         // loop.index0 (0-based)
-        env.add_template(
-            "t2",
-            "{% for i in items %}{{ loop.index0 }}{% endfor %}",
-        )
-        .unwrap();
+        env.add_template("t2", "{% for i in items %}{{ loop.index0 }}{% endfor %}")
+            .unwrap();
         assert_eq!(
             env.get_template("t2")
                 .unwrap()
@@ -1010,11 +962,8 @@ mod tests {
         );
 
         // loop.length
-        env.add_template(
-            "t4",
-            "{% for i in items %}{{ loop.length }}{% endfor %}",
-        )
-        .unwrap();
+        env.add_template("t4", "{% for i in items %}{{ loop.length }}{% endfor %}")
+            .unwrap();
         assert_eq!(
             env.get_template("t4")
                 .unwrap()
@@ -1024,11 +973,8 @@ mod tests {
         );
 
         // loop.revindex (1-based, from end)
-        env.add_template(
-            "t5",
-            "{% for i in items %}{{ loop.revindex }}{% endfor %}",
-        )
-        .unwrap();
+        env.add_template("t5", "{% for i in items %}{{ loop.revindex }}{% endfor %}")
+            .unwrap();
         assert_eq!(
             env.get_template("t5")
                 .unwrap()
@@ -1038,11 +984,8 @@ mod tests {
         );
 
         // loop.revindex0 (0-based, from end)
-        env.add_template(
-            "t6",
-            "{% for i in items %}{{ loop.revindex0 }}{% endfor %}",
-        )
-        .unwrap();
+        env.add_template("t6", "{% for i in items %}{{ loop.revindex0 }}{% endfor %}")
+            .unwrap();
         assert_eq!(
             env.get_template("t6")
                 .unwrap()
@@ -1144,10 +1087,7 @@ mod tests {
         // .capitalize()
         env.add_template("t9", "{{ 'hello'.capitalize() }}")
             .unwrap();
-        assert_eq!(
-            env.get_template("t9").unwrap().render(()).unwrap(),
-            "Hello"
-        );
+        assert_eq!(env.get_template("t9").unwrap().render(()).unwrap(), "Hello");
     }
 
     #[test]
@@ -1177,10 +1117,7 @@ mod tests {
 
         // .zfill()
         env.add_template("t4", "{{ '42'.zfill(5) }}").unwrap();
-        assert_eq!(
-            env.get_template("t4").unwrap().render(()).unwrap(),
-            "00042"
-        );
+        assert_eq!(env.get_template("t4").unwrap().render(()).unwrap(), "00042");
     }
 
     #[test]
@@ -1202,11 +1139,8 @@ mod tests {
         );
 
         // .keys()
-        env.add_template(
-            "t2",
-            "{% for k in data.keys() %}{{ k }} {% endfor %}",
-        )
-        .unwrap();
+        env.add_template("t2", "{% for k in data.keys() %}{{ k }} {% endfor %}")
+            .unwrap();
         assert_eq!(
             env.get_template("t2")
                 .unwrap()
@@ -1216,11 +1150,8 @@ mod tests {
         );
 
         // .values()
-        env.add_template(
-            "t3",
-            "{% for v in data.values() %}{{ v }} {% endfor %}",
-        )
-        .unwrap();
+        env.add_template("t3", "{% for v in data.values() %}{{ v }} {% endfor %}")
+            .unwrap();
         assert_eq!(
             env.get_template("t3")
                 .unwrap()
@@ -1257,11 +1188,8 @@ mod tests {
         let mut env = new_jinja2();
 
         // .append() - should not error in {% do %} context
-        env.add_template(
-            "test",
-            "{% set items = [1, 2] %}{% do items.append(3) %}ok",
-        )
-        .unwrap();
+        env.add_template("test", "{% set items = [1, 2] %}{% do items.append(3) %}ok")
+            .unwrap();
         let result = env.get_template("test").unwrap().render(()).unwrap();
         assert_eq!(result, "ok");
     }
@@ -1284,11 +1212,8 @@ mod tests {
     fn test_is_not_none() {
         // Heavily used in airform: {% if x is not none %}
         let mut env = new_jinja2();
-        env.add_template(
-            "test",
-            "{% if x is not none %}yes{% else %}no{% endif %}",
-        )
-        .unwrap();
+        env.add_template("test", "{% if x is not none %}yes{% else %}no{% endif %}")
+            .unwrap();
         let tmpl = env.get_template("test").unwrap();
         assert_eq!(tmpl.render(context!(x => "hello")).unwrap(), "yes");
         assert_eq!(tmpl.render(context!(x => Value::from(()))).unwrap(), "no");
@@ -1297,21 +1222,15 @@ mod tests {
     #[test]
     fn test_is_mapping() {
         let mut env = new_jinja2();
-        env.add_template(
-            "test",
-            "{% if x is mapping %}map{% else %}not{% endif %}",
-        )
-        .unwrap();
+        env.add_template("test", "{% if x is mapping %}map{% else %}not{% endif %}")
+            .unwrap();
         let tmpl = env.get_template("test").unwrap();
         assert_eq!(
             tmpl.render(context!(x => Value::from_serialize(&json!({"a": 1}))))
                 .unwrap(),
             "map"
         );
-        assert_eq!(
-            tmpl.render(context!(x => "hello")).unwrap(),
-            "not"
-        );
+        assert_eq!(tmpl.render(context!(x => "hello")).unwrap(), "not");
     }
 
     #[test]
@@ -1373,9 +1292,7 @@ mod tests {
         )
         .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(cols => vec!["a", "b", "c"]))
-            .unwrap();
+        let result = tmpl.render(context!(cols => vec!["a", "b", "c"])).unwrap();
         assert_eq!(result, "a, b, c");
     }
 
@@ -1383,11 +1300,8 @@ mod tests {
     fn test_map_attribute() {
         // columns|map(attribute='name')|list - common in airform
         let mut env = new_jinja2();
-        env.add_template(
-            "test",
-            "{{ items|map(attribute='name')|join(', ') }}",
-        )
-        .unwrap();
+        env.add_template("test", "{{ items|map(attribute='name')|join(', ') }}")
+            .unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl
             .render(context!(items => Value::from_serialize(&json!([
@@ -1421,15 +1335,10 @@ mod tests {
     #[test]
     fn test_reject_equalto() {
         let mut env = new_jinja2();
-        env.add_template(
-            "test",
-            "{{ items|reject('equalto', 'b')|join(', ') }}",
-        )
-        .unwrap();
-        let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(items => vec!["a", "b", "c"]))
+        env.add_template("test", "{{ items|reject('equalto', 'b')|join(', ') }}")
             .unwrap();
+        let tmpl = env.get_template("test").unwrap();
+        let result = tmpl.render(context!(items => vec!["a", "b", "c"])).unwrap();
         assert_eq!(result, "a, c");
     }
 
@@ -1459,10 +1368,7 @@ mod tests {
         .unwrap();
         let tmpl = env.get_template("test").unwrap();
         assert_eq!(tmpl.render(()).unwrap(), "on");
-        assert_eq!(
-            tmpl.render(context!(enabled => false)).unwrap(),
-            "off"
-        );
+        assert_eq!(tmpl.render(context!(enabled => false)).unwrap(), "off");
     }
 
     #[test]
@@ -1481,11 +1387,8 @@ mod tests {
     #[test]
     fn test_list_literal_in_set() {
         let mut env = new_jinja2();
-        env.add_template(
-            "test",
-            "{% set items = [1, 2, 3] %}{{ items|join(', ') }}",
-        )
-        .unwrap();
+        env.add_template("test", "{% set items = [1, 2, 3] %}{{ items|join(', ') }}")
+            .unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl.render(()).unwrap();
         assert_eq!(result, "1, 2, 3");
@@ -1494,8 +1397,7 @@ mod tests {
     #[test]
     fn test_nested_attribute_access() {
         let mut env = new_jinja2();
-        env.add_template("test", "{{ data.inner.value }}")
-            .unwrap();
+        env.add_template("test", "{{ data.inner.value }}").unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl
             .render(context!(data => Value::from_serialize(&json!({"inner": {"value": "deep"}}))))
@@ -1506,8 +1408,7 @@ mod tests {
     #[test]
     fn test_bracket_access() {
         let mut env = new_jinja2();
-        env.add_template("test", "{{ data['key'] }}")
-            .unwrap();
+        env.add_template("test", "{{ data['key'] }}").unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl
             .render(context!(data => Value::from_serialize(&json!({"key": "value"}))))
@@ -1556,9 +1457,7 @@ mod tests {
         )
         .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(value => "hello (world)"))
-            .unwrap();
+        let result = tmpl.render(context!(value => "hello (world)")).unwrap();
         assert_eq!(result, "hello_world");
     }
 
@@ -1567,9 +1466,7 @@ mod tests {
         let mut env = new_jinja2();
         env.add_template("test", "{{ value|trim }}").unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(value => "  hello  "))
-            .unwrap();
+        let result = tmpl.render(context!(value => "  hello  ")).unwrap();
         assert_eq!(result, "hello");
     }
 
@@ -1600,11 +1497,8 @@ mod tests {
     #[test]
     fn test_super_in_blocks() {
         let mut env = new_jinja2();
-        env.add_template(
-            "base",
-            "{% block content %}base{% endblock %}",
-        )
-        .unwrap();
+        env.add_template("base", "{% block content %}base{% endblock %}")
+            .unwrap();
         env.add_template(
             "child",
             "{% extends 'base' %}{% block content %}{{ super() }}-child{% endblock %}",
@@ -1631,8 +1525,10 @@ mod tests {
     #[test]
     fn test_dynamic_extends() {
         let mut env = new_jinja2();
-        env.add_template("layout_a", "A:{% block body %}{% endblock %}").unwrap();
-        env.add_template("layout_b", "B:{% block body %}{% endblock %}").unwrap();
+        env.add_template("layout_a", "A:{% block body %}{% endblock %}")
+            .unwrap();
+        env.add_template("layout_b", "B:{% block body %}{% endblock %}")
+            .unwrap();
         env.add_template(
             "test",
             "{% extends layout %}{% block body %}content{% endblock %}",
@@ -1691,9 +1587,7 @@ mod tests {
         let mut env = new_jinja2();
         env.add_template("test", "{{ value|pprint }}").unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(value => vec![1, 2, 3]))
-            .unwrap();
+        let result = tmpl.render(context!(value => vec![1, 2, 3])).unwrap();
         // pprint should produce some representation of the list
         assert!(result.contains("1"));
         assert!(result.contains("2"));
@@ -1713,11 +1607,8 @@ mod tests {
     #[test]
     fn test_chain_filter() {
         let mut env = new_jinja2();
-        env.add_template(
-            "test",
-            "{{ [1, 2]|chain([3, 4])|list|join(', ') }}",
-        )
-        .unwrap();
+        env.add_template("test", "{{ [1, 2]|chain([3, 4])|list|join(', ') }}")
+            .unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl.render(()).unwrap();
         assert_eq!(result, "1, 2, 3, 4");
@@ -1764,8 +1655,7 @@ mod tests {
     #[test]
     fn test_attr_filter() {
         let mut env = new_jinja2();
-        env.add_template("test", "{{ data|attr('name') }}")
-            .unwrap();
+        env.add_template("test", "{{ data|attr('name') }}").unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl
             .render(context!(data => Value::from_serialize(&json!({"name": "test"}))))
@@ -1819,10 +1709,7 @@ mod tests {
         // range(start, stop)
         env.add_template("t2", "{{ range(2, 5)|list|join(',') }}")
             .unwrap();
-        assert_eq!(
-            env.get_template("t2").unwrap().render(()).unwrap(),
-            "2,3,4"
-        );
+        assert_eq!(env.get_template("t2").unwrap().render(()).unwrap(), "2,3,4");
 
         // range(start, stop, step)
         env.add_template("t3", "{{ range(0, 10, 3)|list|join(',') }}")
@@ -1846,11 +1733,8 @@ mod tests {
     #[test]
     fn test_jinja2_comments() {
         let mut env = new_jinja2();
-        env.add_template(
-            "test",
-            "before{# this is a comment #}after",
-        )
-        .unwrap();
+        env.add_template("test", "before{# this is a comment #}after")
+            .unwrap();
         let tmpl = env.get_template("test").unwrap();
         let result = tmpl.render(()).unwrap();
         assert_eq!(result, "beforeafter");
@@ -1947,9 +1831,7 @@ FROM {{ schema }}.{{ table }}",
         let mut env = new_jinja2();
         env.add_template("test", "{{ items|max }}").unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(items => vec![3, 1, 5, 2]))
-            .unwrap();
+        let result = tmpl.render(context!(items => vec![3, 1, 5, 2])).unwrap();
         assert_eq!(result, "5");
     }
 
@@ -1958,9 +1840,7 @@ FROM {{ schema }}.{{ table }}",
         let mut env = new_jinja2();
         env.add_template("test", "{{ items|min }}").unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(items => vec![3, 1, 5, 2]))
-            .unwrap();
+        let result = tmpl.render(context!(items => vec![3, 1, 5, 2])).unwrap();
         assert_eq!(result, "1");
     }
 
@@ -2001,9 +1881,7 @@ FROM {{ schema }}.{{ table }}",
         )
         .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl
-            .render(context!(items => vec![1, 2, 3]))
-            .unwrap();
+        let result = tmpl.render(context!(items => vec![1, 2, 3])).unwrap();
         assert_eq!(result, "1->2 2->3 3 ");
     }
 
@@ -2012,9 +1890,7 @@ FROM {{ schema }}.{{ table }}",
         let mut env = new_jinja2();
         env.add_template("test.html", "{{ value|e }}").unwrap();
         let tmpl = env.get_template("test.html").unwrap();
-        let result = tmpl
-            .render(context!(value => "<b>bold</b>"))
-            .unwrap();
+        let result = tmpl.render(context!(value => "<b>bold</b>")).unwrap();
         assert!(result.contains("&lt;b&gt;"));
     }
 
