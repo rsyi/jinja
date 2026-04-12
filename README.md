@@ -1,11 +1,11 @@
-# jinja2rust
+# jinja2
 
 A Jinja2-compatible template engine for Rust with full feature parity, built on [minijinja](https://github.com/mitsuhiko/minijinja).
 
 ## Quick start
 
 ```rust
-use jinja2rust::{new_jinja2, context};
+use jinja2::{new_jinja2, context};
 
 let mut env = new_jinja2();
 env.add_template("hello", "Hello {{ name|upper }}!").unwrap();
