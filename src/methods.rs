@@ -724,4 +724,37 @@ a={{ d.a }},b={{ d.b }},c={{ d.c }},len={{ d|length }}
         assert!(result.contains("name=alice"), "Expected name=alice, got: {}", result);
         assert!(result.contains("age=30"), "Expected age=30, got: {}", result);
     }
+
+    #[test]
+    fn test_mutable_dict_keys_sorted() {
+        use minijinja::{Environment, context};
+        let mut env = Environment::new();
+        crate::add_jinja2_compat(&mut env);
+        env.add_template("test", r#"
+{%- set d = _mkdict({}) -%}
+{%- set _do0 = d.update({"c": "3"}) -%}
+{%- set _do1 = d.update({"a": "1"}) -%}
+{%- set _do2 = d.update({"b": "2"}) -%}
+{%- for k in d.keys()|sort() -%}{{ k }}={{ d[k] }}{% if not loop.last %},{% endif %}{%- endfor -%}
+"#).unwrap();
+        let tmpl = env.get_template("test").unwrap();
+        let result = tmpl.render(context!{}).unwrap();
+        eprintln!("MutableDict keys sorted: '{}'", result.trim());
+        assert_eq!(result.trim(), "a=1,b=2,c=3");
+    }
+
+    #[test]
+    fn test_mutable_dict_items_method() {
+        use minijinja::{Environment, context};
+        let mut env = Environment::new();
+        crate::add_jinja2_compat(&mut env);
+        env.add_template("test", r#"
+{%- set d = _mkdict({"x": "1", "y": "2"}) -%}
+{%- for _, v in d.items() -%}{{ v }}{% if not loop.last %},{% endif %}{%- endfor -%}
+"#).unwrap();
+        let tmpl = env.get_template("test").unwrap();
+        let result = tmpl.render(context!{}).unwrap();
+        eprintln!("MutableDict items method: '{}'", result.trim());
+        assert_eq!(result.trim(), "1,2");
+    }
 }
