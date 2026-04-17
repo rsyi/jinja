@@ -2,6 +2,12 @@
 
 A Jinja2-compatible template engine for Rust with full feature parity, built on [minijinja](https://github.com/mitsuhiko/minijinja).
 
+## Installation
+
+```sh
+cargo add jinja2
+```
+
 ## Quick start
 
 ```rust
