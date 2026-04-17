@@ -1,11 +1,11 @@
 [package]
-name = "jinja2"
+name = "jinja"
 version = "0.1.0"
 edition = "2021"
 description = "A Jinja2-compatible template engine for Rust with full feature parity, built on minijinja"
 license = "Apache-2.0"
-repository = "https://github.com/rsyi/jinja2"
-homepage = "https://github.com/rsyi/jinja2"
+repository = "https://github.com/rsyi/jinja"
+homepage = "https://github.com/rsyi/jinja"
 keywords = ["jinja", "jinja2", "templates", "template-engine"]
 categories = ["template-engine"]
 readme = "README.md"

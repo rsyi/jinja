@@ -1,9 +1,9 @@
-//! # jinja2
+//! # jinja
 //!
 //! A Jinja2-compatible template engine for Rust with full feature parity,
 //! built on top of [minijinja](https://github.com/mitsuhiko/minijinja).
 //!
-//! jinja2 fills the gaps between minijinja and the full Jinja2 spec by:
+//! jinja fills the gaps between minijinja and the full Jinja2 spec by:
 //! - Registering all missing filters (`center`, `forceescape`, `urlize`, `xmlattr`,
 //!   `as_bool`)
 //! - Registering all contrib filters (`truncate`, `striptags`, `filesizeformat`,
@@ -20,7 +20,7 @@
 //! # Quick Start
 //!
 //! ```rust
-//! use jinja2::{Environment, context};
+//! use jinja::{Environment, context};
 //!
 //! let mut env = Environment::new();
 //! env.add_template("hello", "Hello {{ name|upper }}!").unwrap();
@@ -32,7 +32,7 @@
 //! # Using `new_jinja2()` for full Jinja2 parity
 //!
 //! ```rust
-//! use jinja2::new_jinja2;
+//! use jinja::new_jinja2;
 //!
 //! let mut env = new_jinja2();
 //! env.add_template("test", "{{ 'hello'|center(20) }}").unwrap();

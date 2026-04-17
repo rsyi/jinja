@@ -1,17 +1,17 @@
-# jinja2
+# jinja
 
 A Jinja2-compatible template engine for Rust with full feature parity, built on [minijinja](https://github.com/mitsuhiko/minijinja).
 
 ## Installation
 
 ```sh
-cargo add jinja2
+cargo add jinja
 ```
 
 ## Quick start
 
 ```rust
-use jinja2::{new_jinja2, context};
+use jinja::{new_jinja2, context};
 
 let mut env = new_jinja2();
 env.add_template("hello", "Hello {{ name|upper }}!").unwrap();
@@ -20,7 +20,7 @@ let result = tmpl.render(context!(name => "world")).unwrap();
 assert_eq!(result, "Hello WORLD!");
 ```
 
-`new_jinja2()` returns a `minijinja::Environment` pre-loaded with every Jinja2 built-in. You can also call `add_jinja2_compat(&mut env)` on an existing environment.
+`new_jinja2()` returns a `minijinja::Environment` pre-loaded with every Jinja2 built-in. You can also call `jinja::add_jinja2_compat(&mut env)` on an existing environment.
 
 ## What's included
 
