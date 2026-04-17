@@ -14,9 +14,9 @@
 //! Jinja engines and prevents templates from erroring on common Jinja2/Python
 //! patterns like `{% do items.append(x) %}`.
 
-use std::sync::RwLock;
 use std::fmt;
 use std::sync::Arc;
+use std::sync::RwLock;
 
 use indexmap::IndexMap;
 use minijinja::value::{from_args, Enumerator, Object, ObjectRepr, Value, ValueKind};
@@ -162,9 +162,7 @@ impl Object for MutableList {
             }
             "sort" => {
                 // Basic sort by string representation
-                self.items.write().unwrap().sort_by(|a, b| {
-                    a.to_string().cmp(&b.to_string())
-                });
+                self.items.write().unwrap().sort_by_key(|a| a.to_string());
                 Ok(Value::from(""))
             }
             "index" => {
@@ -659,49 +657,61 @@ mod tests {
 
     #[test]
     fn test_mutable_list_append() {
-        use minijinja::{Environment, context};
+        use minijinja::{context, Environment};
         let mut env = Environment::new();
         crate::add_jinja2_compat(&mut env);
-        env.add_template("test", r#"
+        env.add_template(
+            "test",
+            r#"
 {%- set cols = _mklist([1, 2]) -%}
 {%- if true -%}
   {{ cols.append(3) }}
 {%- endif -%}
 len={{ cols|length }}
-"#).unwrap();
+"#,
+        )
+        .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl.render(context!{}).unwrap();
+        let result = tmpl.render(context! {}).unwrap();
         eprintln!("MutableList append: '{}'", result.trim());
         assert!(result.contains("len=3"), "Expected len=3, got: {}", result);
     }
 
     #[test]
     fn test_mutable_list_iteration() {
-        use minijinja::{Environment, context};
+        use minijinja::{context, Environment};
         let mut env = Environment::new();
         crate::add_jinja2_compat(&mut env);
-        env.add_template("test", r#"
+        env.add_template(
+            "test",
+            r#"
 {%- set cols = _mklist([{"name": "a"}, {"name": "b"}]) -%}
 {%- for col in cols -%}{{ col.name }}{% if not loop.last %},{% endif %}{%- endfor -%}
-"#).unwrap();
+"#,
+        )
+        .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl.render(context!{}).unwrap();
+        let result = tmpl.render(context! {}).unwrap();
         eprintln!("MutableList iter: '{}'", result.trim());
         assert_eq!(result.trim(), "a,b");
     }
 
     #[test]
     fn test_mutable_dict_update() {
-        use minijinja::{Environment, context};
+        use minijinja::{context, Environment};
         let mut env = Environment::new();
         crate::add_jinja2_compat(&mut env);
-        env.add_template("test", r#"
+        env.add_template(
+            "test",
+            r#"
 {%- set d = _mkdict({"a": 1}) -%}
 {{ d.update({"b": 2, "c": 3}) -}}
 a={{ d.a }},b={{ d.b }},c={{ d.c }},len={{ d|length }}
-"#).unwrap();
+"#,
+        )
+        .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl.render(context!{}).unwrap();
+        let result = tmpl.render(context! {}).unwrap();
         eprintln!("MutableDict update: '{}'", result.trim());
         assert!(result.contains("a=1"), "Expected a=1, got: {}", result);
         assert!(result.contains("b=2"), "Expected b=2, got: {}", result);
@@ -711,49 +721,69 @@ a={{ d.a }},b={{ d.b }},c={{ d.c }},len={{ d|length }}
 
     #[test]
     fn test_mutable_dict_iteration() {
-        use minijinja::{Environment, context};
+        use minijinja::{context, Environment};
         let mut env = Environment::new();
         crate::add_jinja2_compat(&mut env);
-        env.add_template("test", r#"
+        env.add_template(
+            "test",
+            r#"
 {%- set d = _mkdict({"name": "alice", "age": "30"}) -%}
 {%- for k, v in d|items -%}{{ k }}={{ v }}{% if not loop.last %},{% endif %}{%- endfor -%}
-"#).unwrap();
+"#,
+        )
+        .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl.render(context!{}).unwrap();
+        let result = tmpl.render(context! {}).unwrap();
         eprintln!("MutableDict iter: '{}'", result.trim());
-        assert!(result.contains("name=alice"), "Expected name=alice, got: {}", result);
-        assert!(result.contains("age=30"), "Expected age=30, got: {}", result);
+        assert!(
+            result.contains("name=alice"),
+            "Expected name=alice, got: {}",
+            result
+        );
+        assert!(
+            result.contains("age=30"),
+            "Expected age=30, got: {}",
+            result
+        );
     }
 
     #[test]
     fn test_mutable_dict_keys_sorted() {
-        use minijinja::{Environment, context};
+        use minijinja::{context, Environment};
         let mut env = Environment::new();
         crate::add_jinja2_compat(&mut env);
-        env.add_template("test", r#"
+        env.add_template(
+            "test",
+            r#"
 {%- set d = _mkdict({}) -%}
 {%- set _do0 = d.update({"c": "3"}) -%}
 {%- set _do1 = d.update({"a": "1"}) -%}
 {%- set _do2 = d.update({"b": "2"}) -%}
 {%- for k in d.keys()|sort() -%}{{ k }}={{ d[k] }}{% if not loop.last %},{% endif %}{%- endfor -%}
-"#).unwrap();
+"#,
+        )
+        .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl.render(context!{}).unwrap();
+        let result = tmpl.render(context! {}).unwrap();
         eprintln!("MutableDict keys sorted: '{}'", result.trim());
         assert_eq!(result.trim(), "a=1,b=2,c=3");
     }
 
     #[test]
     fn test_mutable_dict_items_method() {
-        use minijinja::{Environment, context};
+        use minijinja::{context, Environment};
         let mut env = Environment::new();
         crate::add_jinja2_compat(&mut env);
-        env.add_template("test", r#"
+        env.add_template(
+            "test",
+            r#"
 {%- set d = _mkdict({"x": "1", "y": "2"}) -%}
 {%- for _, v in d.items() -%}{{ v }}{% if not loop.last %},{% endif %}{%- endfor -%}
-"#).unwrap();
+"#,
+        )
+        .unwrap();
         let tmpl = env.get_template("test").unwrap();
-        let result = tmpl.render(context!{}).unwrap();
+        let result = tmpl.render(context! {}).unwrap();
         eprintln!("MutableDict items method: '{}'", result.trim());
         assert_eq!(result.trim(), "1,2");
     }
